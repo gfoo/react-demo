@@ -15,8 +15,7 @@ const AuthForm = (props) => {
     if (form.checkValidity() === true) {
       const enteredEmail = emailInputRef.current.value;
       const enteredPassword = passwordInputRef.current.value;
-
-      fetch("http://localhost:8000/token", {
+      fetch(`${process.env.REACT_APP_API_URL}/token`, {
         method: "POST",
         body: `username=${enteredEmail}&password=${enteredPassword}`,
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
