@@ -121,6 +121,26 @@ export async function updateSuperuser(requestData) {
   }
 }
 
+export async function deleteUser(requestData) {
+  const { userId, token } = requestData;
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/users/${userId}`,
+    {
+      method: "DELETE",
+      headers: {
+        ...buildAuthorizationBearer(token),
+        ...buildContentTypeAppJson(),
+      },
+    }
+  );
+  const data = await response.json();
+  if (response.ok) {
+    return data;
+  } else {
+    throwError(data);
+  }
+}
+
 export async function createUser(requestData) {
   const { email, password, active, superuser, token } = requestData;
   const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, {

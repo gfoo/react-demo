@@ -4,7 +4,7 @@ import useHttp, {
   HTTP_STATUS_COMPLETE,
   HTTP_STATUS_PENDING,
 } from "../../hooks/use-http";
-import { updateActivate, updateSuperuser } from "../../lib/api";
+import { deleteUser, updateActivate, updateSuperuser } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
 import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
@@ -64,6 +64,27 @@ const UserProfile = (props) => {
     });
   };
 
+  const {
+    sendRequest: deleteUserRequest,
+    status: deleteUserStatus,
+    error: deleteUserError,
+  } = useHttp(deleteUser);
+
+  // call parent only if user added
+  useEffect(() => {
+    if (deleteUserStatus === HTTP_STATUS_COMPLETE && !deleteUserError) {
+      props.onUpdate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deleteUserStatus]);
+
+  const onDeleteHandler = () => {
+    deleteUserRequest({
+      userId: props.userId,
+      token,
+    });
+  };
+
   return (
     <Fragment>
       <Card>
@@ -75,7 +96,14 @@ const UserProfile = (props) => {
                 className={classes.align_right}
                 variant="outline-danger"
                 size="sm"
+                onClick={onDeleteHandler}
               >
+                {deleteUserStatus === HTTP_STATUS_PENDING && (
+                  <Fragment>
+                    <SmallSpinner />
+                    &nbsp;
+                  </Fragment>
+                )}
                 Delete
               </Button>
             )}
@@ -153,6 +181,12 @@ const UserProfile = (props) => {
         !updateSuperuserError && (
           <ShowMessage message="Superuser successfully updated!" />
         )}
+      {deleteUserStatus === HTTP_STATUS_COMPLETE && deleteUserError && (
+        <ShowMessage error={true} message={deleteUserError} />
+      )}
+      {deleteUserStatus === HTTP_STATUS_COMPLETE && !deleteUserError && (
+        <ShowMessage message="User successfully deleted!" />
+      )}
     </Fragment>
   );
 };
