@@ -1,6 +1,9 @@
 import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
-import useHttp, { STATUS_COMPLETE, STATUS_PENDING } from "../../hooks/use-http";
+import useHttp, {
+  HTTP_STATUS_COMPLETE,
+  HTTP_STATUS_PENDING,
+} from "../../hooks/use-http";
 import { login } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
 import ShowMessage from "../Layout/ShowMessage";
@@ -37,7 +40,7 @@ const AuthForm = (props) => {
   };
 
   useEffect(() => {
-    if (loginStatus === STATUS_COMPLETE && !loginError) {
+    if (loginStatus === HTTP_STATUS_COMPLETE && !loginError) {
       loginCtx(loginResponse.access_token);
       props.onLogged();
     }
@@ -74,12 +77,12 @@ const AuthForm = (props) => {
             </Form.Group>
 
             <Button
-              disabled={loginStatus === STATUS_PENDING}
+              disabled={loginStatus === HTTP_STATUS_PENDING}
               className={classes.button}
               variant="primary"
               type="submit"
             >
-              {loginStatus === STATUS_PENDING && (
+              {loginStatus === HTTP_STATUS_PENDING && (
                 <Fragment>
                   <SmallSpinner />
                   &nbsp;
@@ -90,7 +93,7 @@ const AuthForm = (props) => {
           </Form>
         </Card.Body>
       </Card>
-      {loginStatus === STATUS_COMPLETE && loginError && (
+      {loginStatus === HTTP_STATUS_COMPLETE && loginError && (
         <ShowMessage error={true} message={loginError} />
       )}
     </Fragment>

@@ -1,3 +1,9 @@
 .margin_bottom {
   margin-bottom: 4px;
 }
+
+.align_right {
+  position: absolute;
+  right: 0;
+  margin-right: 14px;
+}

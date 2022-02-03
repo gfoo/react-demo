@@ -4,15 +4,16 @@ const ACTION_SEND = "SEND";
 const ACTION_SUCCESS = "SUCCESS";
 const ACTION_ERROR = "ERROR";
 
-export const STATUS_PENDING = "PENDING";
-export const STATUS_COMPLETE = "COMPLETE";
+export const HTTP_STATUS_INIT = "INIT";
+export const HTTP_STATUS_PENDING = "PENDING";
+export const HTTP_STATUS_COMPLETE = "COMPLETE";
 
 function httpReducer(state, action) {
   if (action.type === ACTION_SEND) {
     return {
       data: null,
       error: null,
-      status: STATUS_PENDING,
+      status: HTTP_STATUS_PENDING,
     };
   }
 
@@ -20,7 +21,7 @@ function httpReducer(state, action) {
     return {
       data: action.response,
       error: null,
-      status: STATUS_COMPLETE,
+      status: HTTP_STATUS_COMPLETE,
     };
   }
 
@@ -28,7 +29,7 @@ function httpReducer(state, action) {
     return {
       data: null,
       error: action.error,
-      status: STATUS_COMPLETE,
+      status: HTTP_STATUS_COMPLETE,
     };
   }
 
@@ -37,7 +38,7 @@ function httpReducer(state, action) {
 
 function useHttp(requestFunction) {
   const [httpState, dispatch] = useReducer(httpReducer, {
-    status: null,
+    status: HTTP_STATUS_INIT,
     data: null,
     error: null,
   });

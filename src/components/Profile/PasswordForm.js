@@ -1,6 +1,9 @@
 import { Fragment, useContext, useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import useHttp, { STATUS_COMPLETE, STATUS_PENDING } from "../../hooks/use-http";
+import useHttp, {
+  HTTP_STATUS_COMPLETE,
+  HTTP_STATUS_PENDING,
+} from "../../hooks/use-http";
 import { updatePassword } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
 import ShowMessage from "../Layout/ShowMessage";
@@ -38,7 +41,7 @@ const PasswordForm = (props) => {
     }
   };
 
-  if (updatePasswordStatus === STATUS_COMPLETE && !updatePasswordError) {
+  if (updatePasswordStatus === HTTP_STATUS_COMPLETE && !updatePasswordError) {
     oldPasswordInputRef.current.value = "";
     newPasswordInputRef.current.value = "";
   }
@@ -69,12 +72,12 @@ const PasswordForm = (props) => {
           </Form.Control.Feedback>
         </Form.Group>
         <Button
-          disabled={updatePasswordStatus === STATUS_PENDING}
+          variant="outline-primary"
+          disabled={updatePasswordStatus === HTTP_STATUS_PENDING}
           className={classes.button}
-          variant="primary"
           type="submit"
         >
-          {updatePasswordStatus === STATUS_PENDING && (
+          {updatePasswordStatus === HTTP_STATUS_PENDING && (
             <Fragment>
               <SmallSpinner />
               &nbsp;
@@ -83,12 +86,13 @@ const PasswordForm = (props) => {
           Change password
         </Button>
       </Form>
-      {updatePasswordStatus === STATUS_COMPLETE && updatePasswordError && (
+      {updatePasswordStatus === HTTP_STATUS_COMPLETE && updatePasswordError && (
         <ShowMessage error={true} message={updatePasswordError} />
       )}
-      {updatePasswordStatus === STATUS_COMPLETE && !updatePasswordError && (
-        <ShowMessage message="Password successfully updated!" />
-      )}
+      {updatePasswordStatus === HTTP_STATUS_COMPLETE &&
+        !updatePasswordError && (
+          <ShowMessage message="Password successfully updated!" />
+        )}
     </Fragment>
   );
 };
