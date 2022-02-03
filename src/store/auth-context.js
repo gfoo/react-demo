@@ -1,33 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import useHttp from "../hooks/use-http";
+import { getMe } from "../lib/api";
 
 const AuthContext = React.createContext({
   token: null,
   isLoggedIn: false,
-  login: (token, user_id, user_email) => {},
+  userProfile: null,
+  login: (token) => {},
   logout: () => {},
 });
 
+function getStoredToken() {
+  return localStorage.getItem("token");
+}
+
+function setStoredToken(token) {
+  if (token != null) {
+    localStorage.setItem("token", token);
+  } else {
+    localStorage.removeItem("token");
+  }
+}
+
 export const AuthContextProvider = (props) => {
-  let initialToken = localStorage.getItem("token");
+  let initialToken = getStoredToken();
   const [token, setToken] = useState(initialToken);
-  const userIsLoggedIn = !!token;
+  const { sendRequest, data: userProfile } = useHttp(getMe);
+  useEffect(() => {
+    if (token) {
+      sendRequest({ token });
+    }
+  }, [token, sendRequest]);
 
   const logoutHandler = () => {
     setToken(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user_id");
-    localStorage.removeItem("user_email");
+    setStoredToken(null);
   };
   const loginHandler = (token, user_id, user_email) => {
     setToken(token);
-    localStorage.setItem("token", token);
-    localStorage.setItem("user_id", user_id);
-    localStorage.setItem("user_email", user_email);
+    setStoredToken(token);
   };
 
   const contextValue = {
-    token: token,
-    isLoggedIn: userIsLoggedIn,
+    token,
+    isLoggedIn: !!token,
+    userProfile,
     login: loginHandler,
     logout: logoutHandler,
   };

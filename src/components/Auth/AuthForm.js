@@ -1,13 +1,23 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
+import useHttp, { STATUS_COMPLETE, STATUS_PENDING } from "../../hooks/use-http";
+import { login } from "../../lib/api";
+import AuthContext from "../../store/auth-context";
 import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./AuthForm.module.css";
 
 const AuthForm = (props) => {
-  const [errorMessage, setErrorMessage] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const authCtx = useContext(AuthContext);
+
   const [validated, setValidated] = useState(false);
+
+  const {
+    sendRequest: loginRequest,
+    status: loginStatus,
+    data: loginResponse,
+    error: loginError,
+  } = useHttp(login);
 
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -15,35 +25,24 @@ const AuthForm = (props) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     event.stopPropagation();
-    const form = event.currentTarget;
-    if (form.checkValidity() === true) {
-      setIsLoading(true);
-      setErrorMessage(null);
-      const enteredEmail = emailInputRef.current.value;
-      const enteredPassword = passwordInputRef.current.value;
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/token`, {
-          method: "POST",
-          body: `username=${enteredEmail}&password=${enteredPassword}`,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        });
-        setIsLoading(false);
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.detail);
-        } else {
-          props.onLogged(data.access_token, data.user_id, enteredEmail);
-        }
-      } catch (err) {
-        setIsLoading(false);
-        passwordInputRef.current.value = null;
-        setErrorMessage(err.message);
-      }
+    if (event.currentTarget.checkValidity() === true) {
+      loginRequest({
+        email: emailInputRef.current.value,
+        password: passwordInputRef.current.value,
+      });
+      setValidated(false);
+    } else {
+      // view form errors
       setValidated(true);
     }
   };
+
+  useEffect(() => {
+    if (loginStatus === STATUS_COMPLETE && !loginError) {
+      authCtx.login(loginResponse.access_token);
+      props.onLogged();
+    }
+  }, [loginStatus, loginError, loginResponse, authCtx, props]);
 
   return (
     <Fragment>
@@ -76,12 +75,12 @@ const AuthForm = (props) => {
             </Form.Group>
 
             <Button
-              disabled={isLoading}
+              disabled={loginStatus === STATUS_PENDING}
               className={classes.button}
               variant="primary"
               type="submit"
             >
-              {isLoading && (
+              {loginStatus === STATUS_PENDING && (
                 <Fragment>
                   <SmallSpinner />
                   &nbsp;
@@ -92,7 +91,9 @@ const AuthForm = (props) => {
           </Form>
         </Card.Body>
       </Card>
-      {errorMessage && <ShowMessage error={true} message={errorMessage} />}
+      {loginStatus === STATUS_COMPLETE && loginError && (
+        <ShowMessage error={true} message={loginError} />
+      )}
     </Fragment>
   );
 };

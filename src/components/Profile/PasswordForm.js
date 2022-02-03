@@ -1,62 +1,45 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useContext, useRef, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
+import useHttp, { STATUS_COMPLETE, STATUS_PENDING } from "../../hooks/use-http";
+import { updatePassword } from "../../lib/api";
+import AuthContext from "../../store/auth-context";
 import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./PasswordForm.module.css";
 
 const PasswordForm = (props) => {
-  const [errorMessage, setErrorMessage] = useState();
-  const [successMessage, setSuccessMessage] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const { token, userProfile } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
+  const {
+    sendRequest: updatePasswordRequest,
+    status: updatePasswordStatus,
+    error: updatePasswordError,
+  } = useHttp(updatePassword);
 
   const oldPasswordInputRef = useRef();
   const newPasswordInputRef = useRef();
-  const user_id = localStorage.getItem("user_id");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     event.stopPropagation();
-    const form = event.currentTarget;
-    if (form.checkValidity() === true) {
-      setIsLoading(true);
-      setErrorMessage(null);
-      setSuccessMessage(null);
-      const oldEnteredPassword = oldPasswordInputRef.current.value;
-      const newEnteredPassword = newPasswordInputRef.current.value;
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/users/${user_id}/password`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              old_password: oldEnteredPassword,
-              new_password: newEnteredPassword,
-            }),
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        setIsLoading(false);
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.detail);
-        } else {
-          setSuccessMessage("Password successfully updated!");
-          oldPasswordInputRef.current.value = "";
-          newPasswordInputRef.current.value = "";
-          setValidated(false);
-        }
-      } catch (error) {
-        setIsLoading(false);
-        oldPasswordInputRef.current.value = "";
-        newPasswordInputRef.current.value = "";
-        setErrorMessage(error.message);
-      }
+    if (event.currentTarget.checkValidity() === true) {
+      updatePasswordRequest({
+        userId: userProfile.id,
+        token,
+        oldPassword: oldPasswordInputRef.current.value,
+        newPassword: newPasswordInputRef.current.value,
+      });
+      setValidated(false);
+    } else {
+      // view form errors
+      setValidated(true);
     }
   };
+
+  if (updatePasswordStatus === STATUS_COMPLETE && !updatePasswordError) {
+    oldPasswordInputRef.current.value = "";
+    newPasswordInputRef.current.value = "";
+  }
 
   return (
     <Fragment>
@@ -87,12 +70,12 @@ const PasswordForm = (props) => {
             </Form.Group>
 
             <Button
-              disabled={isLoading}
+              disabled={updatePasswordStatus === STATUS_PENDING}
               className={classes.button}
               variant="primary"
               type="submit"
             >
-              {isLoading && (
+              {updatePasswordStatus === STATUS_PENDING && (
                 <Fragment>
                   <SmallSpinner />
                   &nbsp;
@@ -103,8 +86,12 @@ const PasswordForm = (props) => {
           </Form>
         </Card.Body>
       </Card>
-      {errorMessage && <ShowMessage error={true} message={errorMessage} />}
-      {successMessage && <ShowMessage message={successMessage} />}
+      {updatePasswordStatus === STATUS_COMPLETE && updatePasswordError && (
+        <ShowMessage error={true} message={updatePasswordError} />
+      )}
+      {updatePasswordStatus === STATUS_COMPLETE && !updatePasswordError && (
+        <ShowMessage message="Password successfully updated!" />
+      )}
     </Fragment>
   );
 };

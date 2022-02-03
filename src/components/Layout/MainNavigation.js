@@ -22,6 +22,11 @@ const MainNavigation = () => {
           </LinkContainer>
           {authCtx.isLoggedIn && (
             <Navbar.Collapse className="justify-content-end">
+              {authCtx.userProfile && authCtx.userProfile.is_superuser && (
+                <LinkContainer to="/admin">
+                  <Nav.Link>Admin</Nav.Link>
+                </LinkContainer>
+              )}
               <LinkContainer to="/profile">
                 <Nav.Link>Profile</Nav.Link>
               </LinkContainer>

@@ -1,6 +1,7 @@
 import { Fragment, useContext } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
+import Admin from "./pages/Admin";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
@@ -22,6 +23,7 @@ function App() {
           <Fragment>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/*" element={<Navigate to="/" />} />
           </Fragment>
         )}
