@@ -31,7 +31,7 @@ const UserProfile = (props) => {
               </Badge>
             </Col>
             {editActive && (
-              <Col sm={2}>
+              <Col sm={1}>
                 <Button variant="outline-primary" size="sm">
                   {props.isActive ? "Deactivate" : "Activate"}
                 </Button>
@@ -46,7 +46,7 @@ const UserProfile = (props) => {
               </Badge>
             </Col>
             {editSuperuser && (
-              <Col sm={2}>
+              <Col sm={1}>
                 <Button variant="outline-primary" size="sm">
                   {props.isSuperuser
                     ? "Change to normal"
