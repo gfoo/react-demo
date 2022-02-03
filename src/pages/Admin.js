@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import UserForm from "../components/Profile/UserForm";
 import UserList from "../components/Profile/UserList";
 
@@ -9,7 +9,12 @@ const Admin = () => {
     <Container>
       <Row md={2}>
         <Col sm={1}>
-          <UserList refreshing={refreshing}></UserList>
+          <Card>
+            <Card.Body>
+              <Card.Title>Users</Card.Title>
+              <UserList refreshing={refreshing}></UserList>
+            </Card.Body>
+          </Card>
         </Col>
         <Col sm={1}>
           <UserForm
