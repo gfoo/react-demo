@@ -8,18 +8,18 @@ import Profile from "./pages/Profile";
 import AuthContext from "./store/auth-context";
 
 function App() {
-  const authCtx = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
 
   return (
     <Layout>
       <Routes>
-        {!authCtx.isLoggedIn && (
+        {!isLoggedIn && (
           <Fragment>
-            <Route path="/login" element={<Login />} />{" "}
+            <Route path="/login" element={<Login />} />
             <Route path="/*" element={<Navigate to="/login" />} />
           </Fragment>
         )}
-        {authCtx.isLoggedIn && (
+        {isLoggedIn && (
           <Fragment>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<Profile />} />

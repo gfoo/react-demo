@@ -1,5 +1,5 @@
 import { Fragment, useContext, useRef, useState } from "react";
-import { Button, Card, Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import useHttp, { STATUS_COMPLETE, STATUS_PENDING } from "../../hooks/use-http";
 import { updatePassword } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
@@ -8,7 +8,8 @@ import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./PasswordForm.module.css";
 
 const PasswordForm = (props) => {
-  const { token, userProfile } = useContext(AuthContext);
+  const reset = props.resetPassword === true ? true : false;
+  const { token } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
   const {
     sendRequest: updatePasswordRequest,
@@ -24,10 +25,11 @@ const PasswordForm = (props) => {
     event.stopPropagation();
     if (event.currentTarget.checkValidity() === true) {
       updatePasswordRequest({
-        userId: userProfile.id,
+        userId: props.userId,
         token,
         oldPassword: oldPasswordInputRef.current.value,
         newPassword: newPasswordInputRef.current.value,
+        reset,
       });
       setValidated(false);
     } else {
@@ -43,49 +45,44 @@ const PasswordForm = (props) => {
 
   return (
     <Fragment>
-      <Card>
-        <Card.Body>
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            <Form.Group>
-              <Form.Control
-                required
-                ref={oldPasswordInputRef}
-                type="password"
-                placeholder="Old password"
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter the old password
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group>
-              <Form.Control
-                required
-                ref={newPasswordInputRef}
-                type="password"
-                placeholder="New password"
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter the new password
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Button
-              disabled={updatePasswordStatus === STATUS_PENDING}
-              className={classes.button}
-              variant="primary"
-              type="submit"
-            >
-              {updatePasswordStatus === STATUS_PENDING && (
-                <Fragment>
-                  <SmallSpinner />
-                  &nbsp;
-                </Fragment>
-              )}
-              Update
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
+      <Form noValidate validated={validated} onSubmit={handleSubmit}>
+        <Form.Group hidden={reset}>
+          <Form.Control
+            required={!reset}
+            ref={oldPasswordInputRef}
+            type="password"
+            placeholder="Old password"
+          />
+          <Form.Control.Feedback type="invalid">
+            Please enter the old password
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group>
+          <Form.Control
+            required
+            ref={newPasswordInputRef}
+            type="password"
+            placeholder="New password"
+          />
+          <Form.Control.Feedback type="invalid">
+            Please enter the new password
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Button
+          disabled={updatePasswordStatus === STATUS_PENDING}
+          className={classes.button}
+          variant="primary"
+          type="submit"
+        >
+          {updatePasswordStatus === STATUS_PENDING && (
+            <Fragment>
+              <SmallSpinner />
+              &nbsp;
+            </Fragment>
+          )}
+          Change password
+        </Button>
+      </Form>
       {updatePasswordStatus === STATUS_COMPLETE && updatePasswordError && (
         <ShowMessage error={true} message={updatePasswordError} />
       )}

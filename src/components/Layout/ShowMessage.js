@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
+import ReactDom from "react-dom";
 
-const ShowMessage = (props) => {
+const ShowMessageContent = (props) => {
   const [show, setShow] = useState(true);
+
   return (
     <ToastContainer className="p-3" position="bottom-center">
       <Toast
@@ -20,6 +22,18 @@ const ShowMessage = (props) => {
         <Toast.Body>{props.message}</Toast.Body>
       </Toast>
     </ToastContainer>
+  );
+};
+
+const ShowMessage = (props) => {
+  // place ToastContainer at top screen
+  return (
+    <Fragment>
+      {ReactDom.createPortal(
+        <ShowMessageContent error={props.error} message={props.message} />,
+        document.getElementById("root")
+      )}
+    </Fragment>
   );
 };
 

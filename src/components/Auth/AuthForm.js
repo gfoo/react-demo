@@ -8,8 +8,7 @@ import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./AuthForm.module.css";
 
 const AuthForm = (props) => {
-  const authCtx = useContext(AuthContext);
-
+  const { login: loginCtx } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
 
   const {
@@ -39,10 +38,10 @@ const AuthForm = (props) => {
 
   useEffect(() => {
     if (loginStatus === STATUS_COMPLETE && !loginError) {
-      authCtx.login(loginResponse.access_token);
+      loginCtx(loginResponse.access_token);
       props.onLogged();
     }
-  }, [loginStatus, loginError, loginResponse, authCtx, props]);
+  }, [loginStatus, loginError, loginResponse, loginCtx, props]);
 
   return (
     <Fragment>

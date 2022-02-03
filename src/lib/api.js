@@ -32,10 +32,29 @@ export async function getMe(requestData) {
   }
 }
 
+export async function getAllUsers(requestData) {
+  const { token } = requestData;
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
+    method: "GET",
+    headers: {
+      ...buildAuthorizationBearer(token),
+      ...buildContentTypeAppJson(),
+    },
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return data;
+  } else {
+    throwError(data);
+  }
+}
+
 export async function updatePassword(requestData) {
-  const { userId, token, oldPassword, newPassword } = requestData;
+  const { userId, token, oldPassword, newPassword, reset } = requestData;
   const response = await fetch(
-    `${process.env.REACT_APP_API_URL}/users/${userId}/password`,
+    `${process.env.REACT_APP_API_URL}/users/${userId}/${
+      reset ? "reset_" : ""
+    }password`,
     {
       method: "POST",
       body: JSON.stringify({

@@ -3,13 +3,16 @@ import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
-
 const MainNavigation = () => {
-  const authCtx = useContext(AuthContext);
+  const {
+    isLoggedIn,
+    logout: logoutCtx,
+    userProfile,
+  } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const logoutHandler = () => {
-    authCtx.logout();
+    logoutCtx();
     navigate("/");
   };
 
@@ -20,9 +23,9 @@ const MainNavigation = () => {
           <LinkContainer to="/">
             <Navbar.Brand>React-Demo</Navbar.Brand>
           </LinkContainer>
-          {authCtx.isLoggedIn && (
+          {isLoggedIn && (
             <Navbar.Collapse className="justify-content-end">
-              {authCtx.userProfile && authCtx.userProfile.is_superuser && (
+              {userProfile && userProfile.is_superuser && (
                 <LinkContainer to="/admin">
                   <Nav.Link>Admin</Nav.Link>
                 </LinkContainer>
@@ -30,8 +33,13 @@ const MainNavigation = () => {
               <LinkContainer to="/profile">
                 <Nav.Link>Profile</Nav.Link>
               </LinkContainer>
+              <Navbar.Text>
+                <small> [ {userProfile && userProfile.email} ]</small>
+              </Navbar.Text>
               <Nav.Link>
-                <Button onClick={logoutHandler}>Logout</Button>
+                <Button onClick={logoutHandler} size="sm">
+                  Logout
+                </Button>
               </Nav.Link>
             </Navbar.Collapse>
           )}
