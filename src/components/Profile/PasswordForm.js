@@ -2,15 +2,17 @@ import { Fragment, useRef, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
-import classes from "./AuthForm.module.css";
+import classes from "./PasswordForm.module.css";
 
-const AuthForm = (props) => {
+const PasswordForm = (props) => {
   const [errorMessage, setErrorMessage] = useState();
+  const [successMessage, setSuccessMessage] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [validated, setValidated] = useState(false);
 
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
+  const oldPasswordInputRef = useRef();
+  const newPasswordInputRef = useRef();
+  const user_id = localStorage.getItem("user_id");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,29 +21,40 @@ const AuthForm = (props) => {
     if (form.checkValidity() === true) {
       setIsLoading(true);
       setErrorMessage(null);
-      const enteredEmail = emailInputRef.current.value;
-      const enteredPassword = passwordInputRef.current.value;
+      setSuccessMessage(null);
+      const oldEnteredPassword = oldPasswordInputRef.current.value;
+      const newEnteredPassword = newPasswordInputRef.current.value;
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/token`, {
-          method: "POST",
-          body: `username=${enteredEmail}&password=${enteredPassword}`,
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/users/${user_id}/password`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              old_password: oldEnteredPassword,
+              new_password: newEnteredPassword,
+            }),
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         setIsLoading(false);
-        const data = await response.json();
         if (!response.ok) {
+          const data = await response.json();
           throw new Error(data.detail);
         } else {
-          props.onLogged(data.access_token, data.user_id, enteredEmail);
+          setSuccessMessage("Password successfully updated!");
+          oldPasswordInputRef.current.value = "";
+          newPasswordInputRef.current.value = "";
+          setValidated(false);
         }
-      } catch (err) {
+      } catch (error) {
         setIsLoading(false);
-        passwordInputRef.current.value = null;
-        setErrorMessage(err.message);
+        oldPasswordInputRef.current.value = "";
+        newPasswordInputRef.current.value = "";
+        setErrorMessage(error.message);
       }
-      setValidated(true);
     }
   };
 
@@ -51,27 +64,25 @@ const AuthForm = (props) => {
         <Card.Body>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Form.Group>
-              <Form.Label>Email address</Form.Label>
               <Form.Control
                 required
-                ref={emailInputRef}
-                type="email"
-                placeholder="Enter email"
+                ref={oldPasswordInputRef}
+                type="password"
+                placeholder="Old password"
               />
               <Form.Control.Feedback type="invalid">
-                Please enter a valid email
+                Please enter the old password
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
-              <Form.Label>Password</Form.Label>
               <Form.Control
                 required
-                ref={passwordInputRef}
+                ref={newPasswordInputRef}
                 type="password"
-                placeholder="Password"
+                placeholder="New password"
               />
               <Form.Control.Feedback type="invalid">
-                Please enter a password
+                Please enter the new password
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -87,14 +98,15 @@ const AuthForm = (props) => {
                   &nbsp;
                 </Fragment>
               )}
-              Login
+              Update
             </Button>
           </Form>
         </Card.Body>
       </Card>
       {errorMessage && <ShowMessage error={true} message={errorMessage} />}
+      {successMessage && <ShowMessage message={successMessage} />}
     </Fragment>
   );
 };
 
-export default AuthForm;
+export default PasswordForm;
