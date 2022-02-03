@@ -10,7 +10,7 @@ import SmallSpinner from "../Layout/SmallSpinner";
 import UserProfile from "./UserProfile";
 
 const UserList = ({ refreshing }) => {
-  const { token } = useContext(AuthContext);
+  const { token, userProfile: myUserProfile } = useContext(AuthContext);
 
   const [emailFilter, setEmailFilter] = useState("");
   const {
@@ -20,9 +20,14 @@ const UserList = ({ refreshing }) => {
     error: getAllUsersError,
   } = useHttp(getAllUsers);
 
-  useEffect(() => {
+  const onRefreshHandler = () => {
     getAllUsersRequest({ token });
-  }, [getAllUsersRequest, refreshing, token]);
+  };
+
+  useEffect(() => {
+    onRefreshHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshing]);
 
   let allUsers = [];
   if (getAllUsersStatus === HTTP_STATUS_COMPLETE && !getAllUsersError) {
@@ -76,10 +81,17 @@ const UserList = ({ refreshing }) => {
                   isActive={userProfile.is_active}
                   isSuperuser={userProfile.is_superuser}
                   userId={userProfile.id}
-                  resetPassword={true}
-                  editActive={true}
-                  editSuperuser={true}
-                  deletable={true}
+                  resetPassword={
+                    userProfile.id !== myUserProfile.id ? true : false
+                  }
+                  editActive={
+                    userProfile.id !== myUserProfile.id ? true : false
+                  }
+                  editSuperuser={
+                    userProfile.id !== myUserProfile.id ? true : false
+                  }
+                  deletable={userProfile.id !== myUserProfile.id ? true : false}
+                  onUpdate={onRefreshHandler}
                 />
               </Accordion.Body>
             </Accordion.Item>

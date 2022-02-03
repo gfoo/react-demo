@@ -75,6 +75,52 @@ export async function updatePassword(requestData) {
   }
 }
 
+export async function updateActivate(requestData) {
+  const { userId, token, activate } = requestData;
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/users/${userId}/activate`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        activate,
+      }),
+      headers: {
+        ...buildAuthorizationBearer(token),
+        ...buildContentTypeAppJson(),
+      },
+    }
+  );
+  const data = await response.json();
+  if (response.ok) {
+    return data;
+  } else {
+    throwError(data);
+  }
+}
+
+export async function updateSuperuser(requestData) {
+  const { userId, token, superuser } = requestData;
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/users/${userId}/superuser`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        superuser,
+      }),
+      headers: {
+        ...buildAuthorizationBearer(token),
+        ...buildContentTypeAppJson(),
+      },
+    }
+  );
+  const data = await response.json();
+  if (response.ok) {
+    return data;
+  } else {
+    throwError(data);
+  }
+}
+
 export async function createUser(requestData) {
   const { email, password, active, superuser, token } = requestData;
   const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
