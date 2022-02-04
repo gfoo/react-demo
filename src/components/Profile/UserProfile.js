@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Badge, Button, Card, Col, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import useHttp, {
   HTTP_STATUS_COMPLETE,
   HTTP_STATUS_PENDING,
@@ -25,6 +25,7 @@ const UserProfile = ({
   const { token, showMessageRef } = useContext(AuthContext);
   const [isActiveState, setIsActiveState] = useState(isActive);
   const [isSuperuserState, setIsSuperuserState] = useState(isSuperuser);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   const {
     sendRequest: updateActivateRequest,
@@ -60,10 +61,17 @@ const UserProfile = ({
     });
   };
   const onDeleteHandler = () => {
-    deleteUserRequest({
-      userId: userId,
-      token,
-    });
+    setShowConfirmDelete(true);
+  };
+
+  const onConfirmDeleteHandler = (delete_) => {
+    setShowConfirmDelete(false);
+    if (delete_) {
+      deleteUserRequest({
+        userId: userId,
+        token,
+      });
+    }
   };
 
   useEffect(() => {
@@ -138,10 +146,12 @@ const UserProfile = ({
           </Card.Title>
           <Row className={classes.margin_bottom} md={2}>
             <Col sm={1}>
-              Active:&nbsp;
-              <Badge bg={isActiveState ? "success" : "danger"}>
-                {"" + isActiveState}
-              </Badge>
+              <h6>
+                Active:&nbsp;
+                <Badge bg={isActiveState ? "success" : "danger"}>
+                  {"" + isActiveState}
+                </Badge>
+              </h6>
             </Col>
             {editActive && (
               <Col sm={1}>
@@ -163,10 +173,12 @@ const UserProfile = ({
           </Row>
           <Row className={classes.margin_bottom} md={2}>
             <Col sm={1}>
-              Superuser:&nbsp;
-              <Badge bg={isSuperuserState ? "success" : "danger"}>
-                {"" + isSuperuserState}
-              </Badge>
+              <h6>
+                Superuser:&nbsp;
+                <Badge bg={isSuperuserState ? "success" : "danger"}>
+                  {"" + isSuperuserState}
+                </Badge>
+              </h6>
             </Col>
             {editSuperuser && (
               <Col sm={1}>
@@ -189,6 +201,30 @@ const UserProfile = ({
           <PasswordForm userId={userId} resetPassword={resetPassword} />
         </Card.Body>
       </Card>
+
+      <Modal
+        show={showConfirmDelete}
+        onHide={() => onConfirmDeleteHandler(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmation dialog</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Do you really want to delete this user?</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => onConfirmDeleteHandler(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => onConfirmDeleteHandler(true)}
+          >
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

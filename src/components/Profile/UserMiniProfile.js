@@ -12,6 +12,22 @@ const UserMiniProfile = ({ userProfile }) => {
           </h6>
         </>
       )}
+      {!userProfile.is_superuser && (
+        <>
+          <p>&nbsp;</p>
+          <h6>
+            <Badge bg="info">user</Badge>
+          </h6>
+        </>
+      )}
+      {userProfile.is_active && (
+        <>
+          <p>&nbsp;</p>
+          <h6>
+            <Badge bg="success">activated</Badge>
+          </h6>
+        </>
+      )}
       {!userProfile.is_active && (
         <>
           <p>&nbsp;</p>
