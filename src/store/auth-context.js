@@ -22,7 +22,7 @@ function setStoredToken(token) {
   }
 }
 
-export const AuthContextProvider = (props) => {
+export const AuthContextProvider = ({ children }) => {
   let initialToken = getStoredToken();
   const [token, setToken] = useState(initialToken);
   const { sendRequest, data: userProfile } = useHttp(getMe);
@@ -50,9 +50,7 @@ export const AuthContextProvider = (props) => {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {props.children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

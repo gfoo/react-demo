@@ -9,7 +9,7 @@ import AuthContext from "../../store/auth-context";
 import SmallSpinner from "../Layout/SmallSpinner";
 import UserProfile from "./UserProfile";
 
-const UserList = ({ refreshing }) => {
+const UserList = ({ reload }) => {
   const { token, userProfile: myUserProfile } = useContext(AuthContext);
 
   const [emailFilter, setEmailFilter] = useState("");
@@ -20,6 +20,14 @@ const UserList = ({ refreshing }) => {
     error: getAllUsersError,
   } = useHttp(getAllUsers);
 
+  const onDeleteUserHandler = () => {
+    onRefreshHandler();
+  };
+
+  const onUpdateUserHandler = () => {
+    //onRefreshHandler();
+  };
+
   const onRefreshHandler = () => {
     getAllUsersRequest({ token });
   };
@@ -27,7 +35,7 @@ const UserList = ({ refreshing }) => {
   useEffect(() => {
     onRefreshHandler();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshing]);
+  }, [reload]);
 
   let allUsers = [];
   if (getAllUsersStatus === HTTP_STATUS_COMPLETE && !getAllUsersError) {
@@ -91,7 +99,8 @@ const UserList = ({ refreshing }) => {
                     userProfile.id !== myUserProfile.id ? true : false
                   }
                   deletable={userProfile.id !== myUserProfile.id ? true : false}
-                  onUpdate={onRefreshHandler}
+                  onDelete={onDeleteUserHandler}
+                  onUpdate={onUpdateUserHandler}
                 />
               </Accordion.Body>
             </Accordion.Item>

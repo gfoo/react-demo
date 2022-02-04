@@ -12,13 +12,13 @@ const Admin = () => {
           <Card>
             <Card.Body>
               <Card.Title>Users</Card.Title>
-              <UserList refreshing={refreshing}></UserList>
+              <UserList reload={refreshing}></UserList>
             </Card.Body>
           </Card>
         </Col>
         <Col sm={1}>
           <UserForm
-            onAdd={() => {
+            onCreate={() => {
               setRefreshing(!refreshing);
             }}
           />

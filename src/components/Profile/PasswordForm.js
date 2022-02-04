@@ -10,8 +10,8 @@ import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./PasswordForm.module.css";
 
-const PasswordForm = (props) => {
-  const reset = props.resetPassword === true ? true : false;
+const PasswordForm = ({ userId, resetPassword }) => {
+  const reset = resetPassword === true ? true : false;
   const { token } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
   const {
@@ -28,7 +28,7 @@ const PasswordForm = (props) => {
     event.stopPropagation();
     if (event.currentTarget.checkValidity() === true) {
       updatePasswordRequest({
-        userId: props.userId,
+        userId,
         token,
         oldPassword: oldPasswordInputRef.current.value,
         newPassword: newPasswordInputRef.current.value,

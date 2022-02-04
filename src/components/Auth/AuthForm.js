@@ -10,7 +10,7 @@ import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./AuthForm.module.css";
 
-const AuthForm = (props) => {
+const AuthForm = ({ onLogged }) => {
   const { login: loginCtx } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
 
@@ -42,9 +42,9 @@ const AuthForm = (props) => {
   useEffect(() => {
     if (loginStatus === HTTP_STATUS_COMPLETE && !loginError) {
       loginCtx(loginResponse.access_token);
-      props.onLogged();
+      onLogged();
     }
-  }, [loginStatus, loginError, loginResponse, loginCtx, props]);
+  }, [loginStatus, loginError, loginResponse, loginCtx, onLogged]);
 
   return (
     <Fragment>

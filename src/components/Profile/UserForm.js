@@ -15,7 +15,7 @@ import AuthContext from "../../store/auth-context";
 import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 
-const UserForm = (props) => {
+const UserForm = ({ onCreate }) => {
   const { token } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
   const emailInputRef = useRef();
@@ -32,7 +32,7 @@ const UserForm = (props) => {
   // call parent only if user added
   useEffect(() => {
     if (createUserStatus === HTTP_STATUS_COMPLETE && !createUserError) {
-      props.onAdd();
+      onCreate();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createUserStatus]);

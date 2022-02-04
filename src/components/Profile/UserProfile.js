@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { Badge, Button, Card, Col, Row } from "react-bootstrap";
 import useHttp, {
   HTTP_STATUS_COMPLETE,
@@ -11,11 +11,25 @@ import SmallSpinner from "../Layout/SmallSpinner";
 import PasswordForm from "./PasswordForm";
 import classes from "./UserProfile.module.css";
 
-const UserProfile = (props) => {
+const UserProfile = ({
+  userId,
+  email,
+  isActive,
+  isSuperuser,
+  resetPassword,
+  deletable,
+  editActive,
+  editSuperuser,
+  onUpdate,
+  onDelete,
+}) => {
   const { token } = useContext(AuthContext);
-  const deletable = props.deletable === true ? true : false;
-  const editActive = props.editActive === true ? true : false;
-  const editSuperuser = props.editSuperuser === true ? true : false;
+  // const deletable = deletableProps === true ? true : false;
+  // const editActive = editActiveProps === true ? true : false;
+  // const editSuperuser = editSuperuserProps === true ? true : false;
+
+  const [isActiveState, setIsActiveState] = useState(isActive);
+  const [isSuperuserState, setIsSuperuserState] = useState(isSuperuser);
 
   const {
     sendRequest: updateActivateRequest,
@@ -23,19 +37,19 @@ const UserProfile = (props) => {
     error: updateActivateError,
   } = useHttp(updateActivate);
 
-  // call parent only if user added
   useEffect(() => {
     if (updateActivateStatus === HTTP_STATUS_COMPLETE && !updateActivateError) {
-      props.onUpdate();
+      onUpdate();
+      setIsActiveState(!isActiveState);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateActivateStatus]);
 
   const onActivateHandler = () => {
     updateActivateRequest({
-      userId: props.userId,
+      userId: userId,
       token,
-      activate: !props.isActive,
+      activate: !isActiveState,
     });
   };
 
@@ -45,22 +59,22 @@ const UserProfile = (props) => {
     error: updateSuperuserError,
   } = useHttp(updateSuperuser);
 
-  // call parent only if user added
   useEffect(() => {
     if (
       updateSuperuserStatus === HTTP_STATUS_COMPLETE &&
       !updateSuperuserError
     ) {
-      props.onUpdate();
+      onUpdate();
+      setIsSuperuserState(!isSuperuserState);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateSuperuserStatus]);
 
   const onSuperuserHandler = () => {
     updateSuperuserRequest({
-      userId: props.userId,
+      userId: userId,
       token,
-      superuser: !props.isSuperuser,
+      superuser: !isSuperuserState,
     });
   };
 
@@ -70,17 +84,16 @@ const UserProfile = (props) => {
     error: deleteUserError,
   } = useHttp(deleteUser);
 
-  // call parent only if user added
   useEffect(() => {
     if (deleteUserStatus === HTTP_STATUS_COMPLETE && !deleteUserError) {
-      props.onUpdate();
+      onDelete();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deleteUserStatus]);
 
   const onDeleteHandler = () => {
     deleteUserRequest({
-      userId: props.userId,
+      userId: userId,
       token,
     });
   };
@@ -90,7 +103,7 @@ const UserProfile = (props) => {
       <Card>
         <Card.Body>
           <Card.Title>
-            {props.email}
+            {email}
             {deletable && (
               <Button
                 className={classes.align_right}
@@ -111,8 +124,8 @@ const UserProfile = (props) => {
           <Row className={classes.margin_bottom} md={2}>
             <Col sm={1}>
               Active:&nbsp;
-              <Badge bg={props.isActive ? "success" : "danger"}>
-                {"" + props.isActive}
+              <Badge bg={isActiveState ? "success" : "danger"}>
+                {"" + isActiveState}
               </Badge>
             </Col>
             {editActive && (
@@ -128,7 +141,7 @@ const UserProfile = (props) => {
                       &nbsp;
                     </Fragment>
                   )}
-                  {props.isActive ? "Deactivate" : "Activate"}
+                  {isActiveState ? "Deactivate" : "Activate"}
                 </Button>
               </Col>
             )}
@@ -136,8 +149,8 @@ const UserProfile = (props) => {
           <Row className={classes.margin_bottom} md={2}>
             <Col sm={1}>
               Superuser:&nbsp;
-              <Badge bg={props.isSuperuser ? "success" : "danger"}>
-                {"" + props.isSuperuser}
+              <Badge bg={isSuperuserState ? "success" : "danger"}>
+                {"" + isSuperuserState}
               </Badge>
             </Col>
             {editSuperuser && (
@@ -153,17 +166,12 @@ const UserProfile = (props) => {
                       &nbsp;
                     </Fragment>
                   )}
-                  {props.isSuperuser
-                    ? "Change to normal"
-                    : "Change to superuser"}
+                  {isSuperuserState ? "Change to user" : "Change to superuser"}
                 </Button>
               </Col>
             )}
           </Row>
-          <PasswordForm
-            userId={props.userId}
-            resetPassword={props.resetPassword}
-          />
+          <PasswordForm userId={userId} resetPassword={resetPassword} />
         </Card.Body>
       </Card>
       {updateActivateStatus === HTTP_STATUS_COMPLETE && updateActivateError && (
@@ -183,9 +191,6 @@ const UserProfile = (props) => {
         )}
       {deleteUserStatus === HTTP_STATUS_COMPLETE && deleteUserError && (
         <ShowMessage error={true} message={deleteUserError} />
-      )}
-      {deleteUserStatus === HTTP_STATUS_COMPLETE && !deleteUserError && (
-        <ShowMessage message="User successfully deleted!" />
       )}
     </Fragment>
   );

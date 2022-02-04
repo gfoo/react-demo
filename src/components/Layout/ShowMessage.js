@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 import ReactDom from "react-dom";
 
-const ShowMessageContent = (props) => {
+const ShowMessageContent = ({ error, message }) => {
   const [show, setShow] = useState(true);
 
   return (
@@ -10,27 +10,27 @@ const ShowMessageContent = (props) => {
       <Toast
         onClose={() => setShow(false)}
         show={show}
-        bg={props.error === true ? "danger" : "success"}
+        bg={error === true ? "danger" : "success"}
         delay={5000}
         autohide={true}
       >
         <Toast.Header>
           <strong className="me-auto">
-            {props.error === true ? "Error" : "Message"}
+            {error === true ? "Error" : "Message"}
           </strong>
         </Toast.Header>
-        <Toast.Body>{props.message}</Toast.Body>
+        <Toast.Body>{message}</Toast.Body>
       </Toast>
     </ToastContainer>
   );
 };
 
-const ShowMessage = (props) => {
+const ShowMessage = ({ error, message }) => {
   // place ToastContainer at top screen
   return (
     <Fragment>
       {ReactDom.createPortal(
-        <ShowMessageContent error={props.error} message={props.message} />,
+        <ShowMessageContent error={error} message={message} />,
         document.getElementById("root")
       )}
     </Fragment>
