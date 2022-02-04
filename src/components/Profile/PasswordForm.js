@@ -1,4 +1,4 @@
-import { Fragment, useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import useHttp, {
   HTTP_STATUS_COMPLETE,
@@ -6,13 +6,11 @@ import useHttp, {
 } from "../../hooks/use-http";
 import { updatePassword } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
-import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./PasswordForm.module.css";
 
-const PasswordForm = ({ userId, resetPassword }) => {
-  const reset = resetPassword === true ? true : false;
-  const { token } = useContext(AuthContext);
+const PasswordForm = ({ userId, resetPassword = false }) => {
+  const { token, showMessageRef } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
   const {
     sendRequest: updatePasswordRequest,
@@ -32,7 +30,7 @@ const PasswordForm = ({ userId, resetPassword }) => {
         token,
         oldPassword: oldPasswordInputRef.current.value,
         newPassword: newPasswordInputRef.current.value,
-        reset,
+        reset: resetPassword,
       });
       setValidated(false);
     } else {
@@ -41,17 +39,27 @@ const PasswordForm = ({ userId, resetPassword }) => {
     }
   };
 
-  if (updatePasswordStatus === HTTP_STATUS_COMPLETE && !updatePasswordError) {
-    oldPasswordInputRef.current.value = "";
-    newPasswordInputRef.current.value = "";
-  }
+  useEffect(() => {
+    if (updatePasswordStatus === HTTP_STATUS_COMPLETE) {
+      if (!updatePasswordError) {
+        oldPasswordInputRef.current.value = "";
+        newPasswordInputRef.current.value = "";
+      }
+      showMessageRef.current.addMessage({
+        error: !!updatePasswordError,
+        message: updatePasswordError
+          ? updatePasswordError
+          : "Password successfully updated!",
+      });
+    }
+  }, [showMessageRef, updatePasswordError, updatePasswordStatus]);
 
   return (
-    <Fragment>
+    <>
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
-        <Form.Group hidden={reset}>
+        <Form.Group hidden={resetPassword}>
           <Form.Control
-            required={!reset}
+            required={!resetPassword}
             ref={oldPasswordInputRef}
             type="password"
             placeholder="Old password"
@@ -78,22 +86,15 @@ const PasswordForm = ({ userId, resetPassword }) => {
           type="submit"
         >
           {updatePasswordStatus === HTTP_STATUS_PENDING && (
-            <Fragment>
+            <>
               <SmallSpinner />
               &nbsp;
-            </Fragment>
+            </>
           )}
           Change password
         </Button>
       </Form>
-      {updatePasswordStatus === HTTP_STATUS_COMPLETE && updatePasswordError && (
-        <ShowMessage error={true} message={updatePasswordError} />
-      )}
-      {updatePasswordStatus === HTTP_STATUS_COMPLETE &&
-        !updatePasswordError && (
-          <ShowMessage message="Password successfully updated!" />
-        )}
-    </Fragment>
+    </>
   );
 };
 

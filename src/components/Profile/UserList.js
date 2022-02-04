@@ -1,5 +1,5 @@
-import { Fragment, useContext, useEffect, useState } from "react";
-import { Accordion, Badge, Form } from "react-bootstrap";
+import { useContext, useEffect, useState } from "react";
+import { Accordion, Form } from "react-bootstrap";
 import useHttp, {
   HTTP_STATUS_COMPLETE,
   HTTP_STATUS_PENDING,
@@ -7,12 +7,13 @@ import useHttp, {
 import { getAllUsers } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
 import SmallSpinner from "../Layout/SmallSpinner";
+import UserMiniProfile from "./UserMiniProfile";
 import UserProfile from "./UserProfile";
 
 const UserList = ({ reload }) => {
   const { token, userProfile: myUserProfile } = useContext(AuthContext);
-
   const [emailFilter, setEmailFilter] = useState("");
+  const [users, setUsers] = useState([]);
   const {
     sendRequest: getAllUsersRequest,
     status: getAllUsersStatus,
@@ -20,32 +21,29 @@ const UserList = ({ reload }) => {
     error: getAllUsersError,
   } = useHttp(getAllUsers);
 
-  const onDeleteUserHandler = () => {
-    onRefreshHandler();
+  const onDeleteUserHandler = (userId) => {
+    // update element
+    setUsers(users.filter((u) => u.id !== userId));
   };
 
-  const onUpdateUserHandler = () => {
-    //onRefreshHandler();
-  };
-
-  const onRefreshHandler = () => {
-    getAllUsersRequest({ token });
+  const onUpdateUserHandler = (userProfile) => {
+    // update element
+    setUsers(users.map((u) => (u.id === userProfile.id ? userProfile : u)));
   };
 
   useEffect(() => {
-    onRefreshHandler();
+    getAllUsersRequest({ token });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reload]);
-
-  let allUsers = [];
-  if (getAllUsersStatus === HTTP_STATUS_COMPLETE && !getAllUsersError) {
-    allUsers = getAllUsersResponse.sort((u1, u2) =>
-      u1.email < u2.email ? -1 : 1
-    );
-  }
+  }, [reload]); // only on reload
+  useEffect(() => {
+    if (getAllUsersStatus === HTTP_STATUS_COMPLETE && !getAllUsersError) {
+      setUsers(getAllUsersResponse);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getAllUsersStatus]); // only if list reloaded
 
   return (
-    <Fragment>
+    <>
       {getAllUsersStatus === HTTP_STATUS_PENDING && <SmallSpinner />}
       <Form.Group>
         <Form.Control
@@ -59,7 +57,8 @@ const UserList = ({ reload }) => {
         </Form.Control.Feedback>
       </Form.Group>
       <Accordion alwaysOpen>
-        {allUsers
+        {users
+          .sort((u1, u2) => (u1.email < u2.email ? -1 : 1))
           .filter(
             (userProfile) =>
               emailFilter === null ||
@@ -69,19 +68,7 @@ const UserList = ({ reload }) => {
           .map((userProfile) => (
             <Accordion.Item eventKey={userProfile.id} key={userProfile.id}>
               <Accordion.Header>
-                {userProfile.email}
-                {userProfile.is_superuser && (
-                  <Fragment>
-                    <p>&nbsp;</p>
-                    <Badge bg="primary">superuser</Badge>
-                  </Fragment>
-                )}
-                {!userProfile.is_active && (
-                  <Fragment>
-                    <p>&nbsp;</p>
-                    <Badge bg="danger">deactivated</Badge>
-                  </Fragment>
-                )}
+                <UserMiniProfile userProfile={userProfile} />
               </Accordion.Header>
               <Accordion.Body>
                 <UserProfile
@@ -89,16 +76,10 @@ const UserList = ({ reload }) => {
                   isActive={userProfile.is_active}
                   isSuperuser={userProfile.is_superuser}
                   userId={userProfile.id}
-                  resetPassword={
-                    userProfile.id !== myUserProfile.id ? true : false
-                  }
-                  editActive={
-                    userProfile.id !== myUserProfile.id ? true : false
-                  }
-                  editSuperuser={
-                    userProfile.id !== myUserProfile.id ? true : false
-                  }
-                  deletable={userProfile.id !== myUserProfile.id ? true : false}
+                  resetPassword={userProfile.id !== myUserProfile.id}
+                  editActive={userProfile.id !== myUserProfile.id}
+                  editSuperuser={userProfile.id !== myUserProfile.id}
+                  deletable={userProfile.id !== myUserProfile.id}
                   onDelete={onDeleteUserHandler}
                   onUpdate={onUpdateUserHandler}
                 />
@@ -106,7 +87,7 @@ const UserList = ({ reload }) => {
             </Accordion.Item>
           ))}
       </Accordion>
-    </Fragment>
+    </>
   );
 };
 

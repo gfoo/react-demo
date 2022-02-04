@@ -1,40 +1,70 @@
-import { Fragment, useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 import ReactDom from "react-dom";
 
-const ShowMessageContent = ({ error, message }) => {
+const ShowMessageContent = ({ error, message, onClose, id, delay = 5000 }) => {
   const [show, setShow] = useState(true);
 
   return (
-    <ToastContainer className="p-3" position="bottom-center">
-      <Toast
-        onClose={() => setShow(false)}
-        show={show}
-        bg={error === true ? "danger" : "success"}
-        delay={5000}
-        autohide={true}
-      >
-        <Toast.Header>
-          <strong className="me-auto">
-            {error === true ? "Error" : "Message"}
-          </strong>
-        </Toast.Header>
-        <Toast.Body>{message}</Toast.Body>
-      </Toast>
-    </ToastContainer>
+    <Toast
+      onClose={() => {
+        setShow(false);
+        onClose(id);
+      }}
+      show={show}
+      bg={error === true ? "danger" : "success"}
+      delay={delay}
+      autohide={true}
+    >
+      <Toast.Header>
+        <strong className="me-auto">
+          {error === true ? "Error" : "Message"}
+        </strong>
+      </Toast.Header>
+      <Toast.Body>{message}</Toast.Body>
+    </Toast>
   );
 };
 
-const ShowMessage = ({ error, message }) => {
-  // place ToastContainer at top screen
+const ShowMessage = forwardRef(({ delay = 5000 }, ref) => {
+  const [toasts, setToasts] = useState([]);
+
+  const removeToast = (id) => {
+    setToasts(toasts.filter((t) => t.id !== id));
+  };
+
+  useImperativeHandle(ref, () => ({
+    addMessage(toast) {
+      setToasts([...toasts, { ...toast, id: crypto.randomUUID() }]);
+    },
+  }));
+
   return (
-    <Fragment>
+    <>
       {ReactDom.createPortal(
-        <ShowMessageContent error={error} message={message} />,
+        <ToastContainer
+          // always visible
+          style={{
+            zIndex: 1000,
+          }}
+          position="bottom-center"
+        >
+          {toasts.map((t) => (
+            <ShowMessageContent
+              id={t.useImperativeHandle}
+              key={t.id}
+              error={t.error}
+              message={t.message}
+              onClose={(id) => removeToast(id)}
+              delay={delay}
+            />
+          ))}
+        </ToastContainer>,
+        // place ToastContainer at top screen id=root
         document.getElementById("root")
       )}
-    </Fragment>
+    </>
   );
-};
+});
 
 export default ShowMessage;

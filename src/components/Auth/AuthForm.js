@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import useHttp, {
   HTTP_STATUS_COMPLETE,
@@ -6,12 +6,11 @@ import useHttp, {
 } from "../../hooks/use-http";
 import { login } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
-import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./AuthForm.module.css";
 
 const AuthForm = ({ onLogged }) => {
-  const { login: loginCtx } = useContext(AuthContext);
+  const { login: loginCtx, showMessageRef } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
 
   const {
@@ -40,14 +39,28 @@ const AuthForm = ({ onLogged }) => {
   };
 
   useEffect(() => {
-    if (loginStatus === HTTP_STATUS_COMPLETE && !loginError) {
-      loginCtx(loginResponse.access_token);
-      onLogged();
+    if (loginStatus === HTTP_STATUS_COMPLETE) {
+      if (!loginError) {
+        loginCtx(loginResponse.access_token);
+        onLogged();
+      } else {
+        showMessageRef.current.addMessage({
+          error: true,
+          message: loginError,
+        });
+      }
     }
-  }, [loginStatus, loginError, loginResponse, loginCtx, onLogged]);
+  }, [
+    loginStatus,
+    loginError,
+    loginResponse,
+    loginCtx,
+    onLogged,
+    showMessageRef,
+  ]);
 
   return (
-    <Fragment>
+    <>
       <Card>
         <Card.Body>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -83,20 +96,17 @@ const AuthForm = ({ onLogged }) => {
               type="submit"
             >
               {loginStatus === HTTP_STATUS_PENDING && (
-                <Fragment>
+                <>
                   <SmallSpinner />
                   &nbsp;
-                </Fragment>
+                </>
               )}
               Login
             </Button>
           </Form>
         </Card.Body>
       </Card>
-      {loginStatus === HTTP_STATUS_COMPLETE && loginError && (
-        <ShowMessage error={true} message={loginError} />
-      )}
-    </Fragment>
+    </>
   );
 };
 

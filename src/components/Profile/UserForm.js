@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import useHttp, {
   HTTP_STATUS_COMPLETE,
@@ -12,11 +6,10 @@ import useHttp, {
 } from "../../hooks/use-http";
 import { createUser } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
-import ShowMessage from "../Layout/ShowMessage";
 import SmallSpinner from "../Layout/SmallSpinner";
 
 const UserForm = ({ onCreate }) => {
-  const { token } = useContext(AuthContext);
+  const { token, showMessageRef } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -31,11 +24,23 @@ const UserForm = ({ onCreate }) => {
 
   // call parent only if user added
   useEffect(() => {
-    if (createUserStatus === HTTP_STATUS_COMPLETE && !createUserError) {
-      onCreate();
+    if (createUserStatus === HTTP_STATUS_COMPLETE) {
+      if (!createUserError) {
+        emailInputRef.current.value = "";
+        passwordInputRef.current.value = "";
+        setActiveInput(true);
+        setSuperuserInput(false);
+        onCreate();
+      }
+      showMessageRef.current.addMessage({
+        error: !!createUserError,
+        message: createUserError
+          ? createUserError
+          : "User successfully created!",
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createUserStatus]);
+  }, [createUserStatus]); // deps of createUserStatus only because parent will re-render this child
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -55,13 +60,8 @@ const UserForm = ({ onCreate }) => {
     }
   };
 
-  if (createUserStatus === HTTP_STATUS_COMPLETE && !createUserError) {
-    emailInputRef.current.value = "";
-    passwordInputRef.current.value = "";
-  }
-
   return (
-    <Fragment>
+    <>
       <Card>
         <Card.Body>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -110,23 +110,17 @@ const UserForm = ({ onCreate }) => {
               type="submit"
             >
               {createUserStatus === HTTP_STATUS_PENDING && (
-                <Fragment>
+                <>
                   <SmallSpinner />
                   &nbsp;
-                </Fragment>
+                </>
               )}
               Create user
             </Button>
           </Form>
-          {createUserStatus === HTTP_STATUS_COMPLETE && createUserError && (
-            <ShowMessage error={true} message={createUserError} />
-          )}
-          {createUserStatus === HTTP_STATUS_COMPLETE && !createUserError && (
-            <ShowMessage message="User successfully created!" />
-          )}
         </Card.Body>
       </Card>
-    </Fragment>
+    </>
   );
 };
 

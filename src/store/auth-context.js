@@ -8,6 +8,8 @@ const AuthContext = React.createContext({
   userProfile: null,
   login: (token) => {},
   logout: () => {},
+  showMessageRef: null,
+  setShowMessageRef: (ref) => {},
 });
 
 function getStoredToken() {
@@ -23,30 +25,29 @@ function setStoredToken(token) {
 }
 
 export const AuthContextProvider = ({ children }) => {
-  let initialToken = getStoredToken();
-  const [token, setToken] = useState(initialToken);
+  const [token, setToken] = useState(getStoredToken());
+  const [showMessageRef, setShowMessageRef] = useState(null);
   const { sendRequest, data: userProfile } = useHttp(getMe);
   useEffect(() => {
     if (token) {
+      // load userProfile
       sendRequest({ token });
     }
   }, [token, sendRequest]);
-
-  const logoutHandler = () => {
-    setToken(null);
-    setStoredToken(null);
-  };
-  const loginHandler = (token, user_id, user_email) => {
-    setToken(token);
-    setStoredToken(token);
-  };
-
   const contextValue = {
     token,
     isLoggedIn: !!token,
     userProfile,
-    login: loginHandler,
-    logout: logoutHandler,
+    login: (token) => {
+      setToken(token);
+      setStoredToken(token);
+    },
+    logout: () => {
+      setToken(null);
+      setStoredToken(null);
+    },
+    showMessageRef,
+    setShowMessageRef,
   };
 
   return (
