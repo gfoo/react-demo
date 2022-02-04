@@ -25,14 +25,17 @@ const MainNavigation = () => {
           </LinkContainer>
           {isLoggedIn && (
             <Navbar.Collapse className="justify-content-end">
+              <LinkContainer to="/projects">
+                <Nav.Link>Projects</Nav.Link>
+              </LinkContainer>
+              <LinkContainer to="/profile">
+                <Nav.Link>Profile</Nav.Link>
+              </LinkContainer>
               {userProfile && userProfile.is_superuser && (
                 <LinkContainer to="/admin">
                   <Nav.Link>Admin</Nav.Link>
                 </LinkContainer>
               )}
-              <LinkContainer to="/profile">
-                <Nav.Link>Profile</Nav.Link>
-              </LinkContainer>
               <Navbar.Text>
                 <small> [ {userProfile && userProfile.email} ]</small>
               </Navbar.Text>

@@ -3,9 +3,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import ShowMessage from "./components/Layout/ShowMessage";
 import Admin from "./pages/Admin";
-import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import ProjectsPage from "./pages/ProjectsPage";
 import AuthContext from "./store/auth-context";
 
 function App() {
@@ -27,7 +27,8 @@ function App() {
         )}
         {isLoggedIn && (
           <>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<Navigate to="/projects" />} />
+            <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/*" element={<Navigate to="/" />} />
