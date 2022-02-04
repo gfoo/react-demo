@@ -21,7 +21,14 @@ const MainNavigation = () => {
       <Navbar bg="light" variant="light">
         <Container>
           <LinkContainer to="/">
-            <Navbar.Brand>React-Demo</Navbar.Brand>
+            <Navbar.Brand>
+              <img
+                src="/Brand.png"
+                height="30"
+                className="d-inline-block align-top"
+                alt="TrendyWords"
+              />
+            </Navbar.Brand>
           </LinkContainer>
           {isLoggedIn && (
             <Navbar.Collapse className="justify-content-end">
