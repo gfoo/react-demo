@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Row } from "react-bootstrap";
 import useHttp, {
   HTTP_STATUS_COMPLETE,
   HTTP_STATUS_PENDING,
 } from "../../hooks/use-http";
 import { deleteUser, updateActivate, updateSuperuser } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
+import ConfirmModal from "../Layout/ConfirmModal";
 import SmallSpinner from "../Layout/SmallSpinner";
 import PasswordForm from "./PasswordForm";
 import classes from "./UserProfile.module.css";
@@ -13,6 +14,7 @@ import classes from "./UserProfile.module.css";
 const UserProfile = ({
   userId,
   email,
+  fullname,
   isActive,
   isSuperuser,
   resetPassword = false,
@@ -106,6 +108,7 @@ const UserProfile = ({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateSuperuserStatus]);
+
   useEffect(() => {
     if (deleteUserStatus === HTTP_STATUS_COMPLETE) {
       if (!deleteUserError) {
@@ -125,8 +128,8 @@ const UserProfile = ({
     <>
       <Card>
         <Card.Body>
-          <Card.Title>
-            {email}
+          <p>
+            <strong>{fullname}</strong> [{email}]
             {deletable && (
               <Button
                 className={classes.align_right}
@@ -136,18 +139,17 @@ const UserProfile = ({
               >
                 {deleteUserStatus === HTTP_STATUS_PENDING && (
                   <>
-                    <SmallSpinner />
-                    &nbsp;
+                    <SmallSpinner />{" "}
                   </>
                 )}
                 Delete
               </Button>
             )}
-          </Card.Title>
+          </p>
           <Row className={classes.margin_bottom} md={2}>
             <Col sm={1}>
               <h6>
-                Active:&nbsp;
+                Active:{" "}
                 <Badge bg={isActiveState ? "success" : "danger"}>
                   {"" + isActiveState}
                 </Badge>
@@ -162,8 +164,7 @@ const UserProfile = ({
                 >
                   {updateActivateStatus === HTTP_STATUS_PENDING && (
                     <>
-                      <SmallSpinner />
-                      &nbsp;
+                      <SmallSpinner />{" "}
                     </>
                   )}
                   {isActiveState ? "Deactivate" : "Activate"}
@@ -174,7 +175,7 @@ const UserProfile = ({
           <Row className={classes.margin_bottom} md={2}>
             <Col sm={1}>
               <h6>
-                Superuser:&nbsp;
+                Superuser:{" "}
                 <Badge bg={isSuperuserState ? "success" : "danger"}>
                   {"" + isSuperuserState}
                 </Badge>
@@ -189,8 +190,7 @@ const UserProfile = ({
                 >
                   {updateSuperuserStatus === HTTP_STATUS_PENDING && (
                     <>
-                      <SmallSpinner />
-                      &nbsp;
+                      <SmallSpinner />{" "}
                     </>
                   )}
                   {isSuperuserState ? "Change to user" : "Change to superuser"}
@@ -201,30 +201,11 @@ const UserProfile = ({
           <PasswordForm userId={userId} resetPassword={resetPassword} />
         </Card.Body>
       </Card>
-
-      <Modal
+      <ConfirmModal
+        message="Do you really want to delete this user?"
         show={showConfirmDelete}
-        onHide={() => onConfirmDeleteHandler(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmation dialog</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Do you really want to delete this user?</Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => onConfirmDeleteHandler(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => onConfirmDeleteHandler(true)}
-          >
-            Confirm
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        onConfirm={(confirm) => onConfirmDeleteHandler(confirm)}
+      />
     </>
   );
 };

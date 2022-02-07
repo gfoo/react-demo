@@ -5,7 +5,8 @@ import ShowMessage from "./components/Layout/ShowMessage";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
-import ProjectsPage from "./pages/ProjectsPage";
+import Project from "./pages/Project";
+import Projects from "./pages/Projects";
 import AuthContext from "./store/auth-context";
 
 function App() {
@@ -28,7 +29,8 @@ function App() {
         {isLoggedIn && (
           <>
             <Route path="/" element={<Navigate to="/projects" />} />
-            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects" exact element={<Projects />} />
+            <Route path="/projects/:project_id" element={<Project />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/*" element={<Navigate to="/" />} />

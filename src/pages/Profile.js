@@ -14,6 +14,7 @@ const Profile = () => {
           {userProfile && (
             <UserProfile
               email={userProfile.email}
+              fullname={userProfile.fullname}
               isActive={userProfile.is_active}
               isSuperuser={userProfile.is_superuser}
               userId={userProfile.id}

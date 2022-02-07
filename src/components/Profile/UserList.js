@@ -1,70 +1,67 @@
-import { useContext, useEffect, useState } from "react";
-import { Accordion, Form } from "react-bootstrap";
-import useHttp, {
-  HTTP_STATUS_COMPLETE,
-  HTTP_STATUS_PENDING,
-} from "../../hooks/use-http";
-import { getAllUsers } from "../../lib/api";
+import { useContext, useState } from "react";
+import { Accordion, Col, Form, Row } from "react-bootstrap";
 import AuthContext from "../../store/auth-context";
-import SmallSpinner from "../Layout/SmallSpinner";
 import UserMiniProfile from "./UserMiniProfile";
 import UserProfile from "./UserProfile";
 
-const UserList = ({ reload }) => {
-  const { token, userProfile: myUserProfile } = useContext(AuthContext);
-  const [emailFilter, setEmailFilter] = useState("");
-  const [users, setUsers] = useState([]);
-  const {
-    sendRequest: getAllUsersRequest,
-    status: getAllUsersStatus,
-    data: getAllUsersResponse,
-    error: getAllUsersError,
-  } = useHttp(getAllUsers);
+const UserList = ({ users = [], onDelete = () => {}, onUpdate = () => {} }) => {
+  const { userProfile: myUserProfile } = useContext(AuthContext);
+  const [emailFullNameFilter, setEmailFullNameFilter] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [superuserFilter, setSuperuserFilter] = useState("All");
 
-  const onDeleteUserHandler = (userId) => {
-    // update element
-    setUsers(users.filter((u) => u.id !== userId));
+  const filterUser = (userProfile) => {
+    return (
+      (emailFullNameFilter === null ||
+        emailFullNameFilter.trim().length === 0 ||
+        userProfile.email.includes(emailFullNameFilter.trim()) ||
+        userProfile.fullname.includes(emailFullNameFilter.trim())) &&
+      (activeFilter === "All" ||
+        (activeFilter === "Activated" && userProfile.is_active) ||
+        (activeFilter === "Deactivated" && !userProfile.is_active)) &&
+      (superuserFilter === "All" ||
+        (superuserFilter === "Superuser" && userProfile.is_superuser) ||
+        (superuserFilter === "User" && !userProfile.is_superuser))
+    );
   };
-
-  const onUpdateUserHandler = (userProfile) => {
-    // update element
-    setUsers(users.map((u) => (u.id === userProfile.id ? userProfile : u)));
-  };
-
-  useEffect(() => {
-    getAllUsersRequest({ token });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reload]); // only on reload
-  useEffect(() => {
-    if (getAllUsersStatus === HTTP_STATUS_COMPLETE && !getAllUsersError) {
-      setUsers(getAllUsersResponse);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getAllUsersStatus]); // only if list reloaded
 
   return (
     <>
-      {getAllUsersStatus === HTTP_STATUS_PENDING && <SmallSpinner />}
-      <Form.Group>
-        <Form.Control
-          required
-          type="text"
-          placeholder="Filtering email"
-          onChange={(event) => setEmailFilter(event.target.value)}
-        />
-        <Form.Control.Feedback type="invalid">
-          Please enter a valid email
-        </Form.Control.Feedback>
-      </Form.Group>
+      <Row xs="auto">
+        <Col>
+          <Form.Control
+            size="sm"
+            type="text"
+            placeholder="Filtering email or fullname"
+            onChange={(event) => setEmailFullNameFilter(event.target.value)}
+          />
+        </Col>
+        <Col>
+          <Form.Select
+            size="sm"
+            onChange={(event) => setActiveFilter(event.target.value)}
+          >
+            <option value="All">All</option>
+            <option value="Activated">Activated</option>
+            <option value="Deactivated">Deactivated</option>
+          </Form.Select>
+        </Col>
+        <Col>
+          <Form.Select
+            size="sm"
+            onChange={(event) => setSuperuserFilter(event.target.value)}
+          >
+            <option value="All">All</option>
+            <option value="Superuser">Superuser</option>
+            <option value="User">User</option>
+          </Form.Select>
+        </Col>
+      </Row>
+      <p></p>
       <Accordion alwaysOpen>
         {users
           .sort((u1, u2) => (u1.email < u2.email ? -1 : 1))
-          .filter(
-            (userProfile) =>
-              emailFilter === null ||
-              emailFilter.trim().length === 0 ||
-              userProfile.email.includes(emailFilter.trim())
-          )
+          .filter(filterUser)
           .map((userProfile) => (
             <Accordion.Item eventKey={userProfile.id} key={userProfile.id}>
               <Accordion.Header>
@@ -73,6 +70,7 @@ const UserList = ({ reload }) => {
               <Accordion.Body>
                 <UserProfile
                   email={userProfile.email}
+                  fullname={userProfile.fullname}
                   isActive={userProfile.is_active}
                   isSuperuser={userProfile.is_superuser}
                   userId={userProfile.id}
@@ -80,8 +78,8 @@ const UserList = ({ reload }) => {
                   editActive={userProfile.id !== myUserProfile.id}
                   editSuperuser={userProfile.id !== myUserProfile.id}
                   deletable={userProfile.id !== myUserProfile.id}
-                  onDelete={onDeleteUserHandler}
-                  onUpdate={onUpdateUserHandler}
+                  onDelete={onDelete}
+                  onUpdate={onUpdate}
                 />
               </Accordion.Body>
             </Accordion.Item>

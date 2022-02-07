@@ -15,6 +15,15 @@ function throwError(data) {
   throw new Error(error);
 }
 
+async function getJsonResult(response) {
+  const data = await response.json();
+  if (response.ok) {
+    return data;
+  } else {
+    throwError(data);
+  }
+}
+
 export async function getMe(requestData) {
   const { token } = requestData;
   const response = await fetch(`${process.env.REACT_APP_API_URL}/users/me`, {
@@ -24,12 +33,7 @@ export async function getMe(requestData) {
       ...buildContentTypeAppJson(),
     },
   });
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+  return getJsonResult(response);
 }
 
 export async function getAllUsers(requestData) {
@@ -41,12 +45,7 @@ export async function getAllUsers(requestData) {
       ...buildContentTypeAppJson(),
     },
   });
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+  return getJsonResult(response);
 }
 
 export async function updatePassword(requestData) {
@@ -67,12 +66,7 @@ export async function updatePassword(requestData) {
       },
     }
   );
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+  return getJsonResult(response);
 }
 
 export async function updateActivate(requestData) {
@@ -90,12 +84,7 @@ export async function updateActivate(requestData) {
       },
     }
   );
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+  return getJsonResult(response);
 }
 
 export async function updateSuperuser(requestData) {
@@ -113,12 +102,7 @@ export async function updateSuperuser(requestData) {
       },
     }
   );
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+  return getJsonResult(response);
 }
 
 export async function deleteUser(requestData) {
@@ -133,20 +117,16 @@ export async function deleteUser(requestData) {
       },
     }
   );
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+  return getJsonResult(response);
 }
 
 export async function createUser(requestData) {
-  const { email, password, active, superuser, token } = requestData;
+  const { email, fullname, password, active, superuser, token } = requestData;
   const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
     method: "POST",
     body: JSON.stringify({
       email,
+      fullname,
       is_active: active,
       is_superuser: superuser,
       password,
@@ -156,12 +136,7 @@ export async function createUser(requestData) {
       ...buildContentTypeAppJson(),
     },
   });
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+  return getJsonResult(response);
 }
 
 export async function login(requestData) {
@@ -173,11 +148,84 @@ export async function login(requestData) {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   });
+  return getJsonResult(response);
+}
 
-  const data = await response.json();
-  if (response.ok) {
-    return data;
-  } else {
-    throwError(data);
-  }
+export async function getProjects(requestData) {
+  const { token } = requestData;
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/projects`, {
+    method: "GET",
+    headers: {
+      ...buildAuthorizationBearer(token),
+      ...buildContentTypeAppJson(),
+    },
+  });
+  return getJsonResult(response);
+}
+
+export async function getProject(requestData) {
+  const { projectId, token } = requestData;
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/projects/${projectId}`,
+    {
+      method: "GET",
+      headers: {
+        ...buildAuthorizationBearer(token),
+        ...buildContentTypeAppJson(),
+      },
+    }
+  );
+  return getJsonResult(response);
+}
+
+export async function createProject(requestData) {
+  const { name, description, private_, token } = requestData;
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/projects`, {
+    method: "POST",
+    body: JSON.stringify({
+      name,
+      description,
+      private: private_,
+    }),
+    headers: {
+      ...buildAuthorizationBearer(token),
+      ...buildContentTypeAppJson(),
+    },
+  });
+  return getJsonResult(response);
+}
+
+export async function deleteProject(requestData) {
+  const { projectId, token } = requestData;
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/projects/${projectId}`,
+    {
+      method: "DELETE",
+      headers: {
+        ...buildAuthorizationBearer(token),
+        ...buildContentTypeAppJson(),
+      },
+    }
+  );
+  return getJsonResult(response);
+}
+
+export async function updateProject(requestData) {
+  const { projectId, name, description, private_, token } = requestData;
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/projects/${projectId}`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        name,
+        description,
+        private: private_,
+      }),
+      headers: {
+        ...buildAuthorizationBearer(token),
+        ...buildContentTypeAppJson(),
+      },
+    }
+  );
+  return getJsonResult(response);
 }

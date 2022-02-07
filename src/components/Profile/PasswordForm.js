@@ -87,8 +87,7 @@ const PasswordForm = ({ userId, resetPassword = false }) => {
         >
           {updatePasswordStatus === HTTP_STATUS_PENDING && (
             <>
-              <SmallSpinner />
-              &nbsp;
+              <SmallSpinner />{" "}
             </>
           )}
           Change password

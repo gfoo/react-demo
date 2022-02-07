@@ -35,16 +35,16 @@ const MainNavigation = () => {
               <LinkContainer to="/projects">
                 <Nav.Link>Projects</Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/profile">
-                <Nav.Link>Profile</Nav.Link>
-              </LinkContainer>
               {userProfile && userProfile.is_superuser && (
                 <LinkContainer to="/admin">
                   <Nav.Link>Admin</Nav.Link>
                 </LinkContainer>
               )}
+              <LinkContainer to="/profile">
+                <Nav.Link>Profile</Nav.Link>
+              </LinkContainer>
               <Navbar.Text>
-                <small> [ {userProfile && userProfile.email} ]</small>
+                <small> [ {userProfile && userProfile.fullname} ]</small>
               </Navbar.Text>
               <Nav.Link>
                 <Button onClick={logoutHandler} size="sm">

@@ -97,8 +97,7 @@ const AuthForm = ({ onLogged }) => {
             >
               {loginStatus === HTTP_STATUS_PENDING && (
                 <>
-                  <SmallSpinner />
-                  &nbsp;
+                  <SmallSpinner />{" "}
                 </>
               )}
               Login
