@@ -107,14 +107,18 @@ const UserForm = ({ onCreate = () => {} }) => {
         <Form.Check
           type="switch"
           checked={activateInput}
-          onChange={() => setActiveInput(!activateInput)}
+          onChange={() =>
+            setActiveInput((prevActivateInput) => !prevActivateInput)
+          }
           label="Active"
         />
         <Form.Check
           type="switch"
           defaultValue="on"
           checked={superuserInput}
-          onChange={() => setSuperuserInput(!superuserInput)}
+          onChange={() =>
+            setSuperuserInput((prevSuperuserInput) => !prevSuperuserInput)
+          }
           label="Superuser"
         />
       </Form.Group>

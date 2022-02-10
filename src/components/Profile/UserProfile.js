@@ -82,7 +82,7 @@ const UserProfile = ({
     if (updateActivateStatus === HTTP_STATUS_COMPLETE) {
       if (!updateActivateError) {
         onUpdate(updateActivateData);
-        setIsActiveState(!isActiveState);
+        setIsActiveState((prevIsActiveState) => !prevIsActiveState);
       }
       showMessageRef.current.addMessage({
         error: !!updateActivateError,
@@ -98,7 +98,7 @@ const UserProfile = ({
     if (updateSuperuserStatus === HTTP_STATUS_COMPLETE) {
       if (!updateSuperuserError) {
         onUpdate(updateSuperuserData);
-        setIsSuperuserState(!isSuperuserState);
+        setIsSuperuserState((prevIsSuperuserState) => !prevIsSuperuserState);
       }
       showMessageRef.current.addMessage({
         error: !!updateSuperuserError,

@@ -57,7 +57,9 @@ const Projects = () => {
   }, [getProjectsStatus]);
 
   const onDeleteUserHandler = (projectId) => {
-    setProjects(projects.filter((p) => p.id !== projectId));
+    setProjects((prevProjects) =>
+      prevProjects.filter((p) => p.id !== projectId)
+    );
   };
 
   const onSubmitCreateHandler = async (event, project) => {

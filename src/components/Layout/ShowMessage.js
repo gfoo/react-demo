@@ -35,7 +35,10 @@ const ShowMessage = forwardRef(({ delay = 5000 }, ref) => {
 
   useImperativeHandle(ref, () => ({
     addMessage(toast) {
-      setToasts([...toasts, { ...toast, id: crypto.randomUUID() }]);
+      setToasts((prevToasts) => [
+        ...prevToasts,
+        { ...toast, id: crypto.randomUUID() },
+      ]);
     },
   }));
 

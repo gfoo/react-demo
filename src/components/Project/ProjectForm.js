@@ -35,10 +35,10 @@ const ProjectForm = ({
           placeholder="Enter name"
           value={projectInput.name}
           onChange={(event) =>
-            setProjectInput({
-              ...projectInput,
+            setProjectInput((prevProjectInput) => ({
+              ...prevProjectInput,
               name: event.target.value,
-            })
+            }))
           }
         />
         <Form.Control.Feedback type="invalid">
@@ -54,10 +54,10 @@ const ProjectForm = ({
           placeholder="Enter a description"
           value={projectInput.description}
           onChange={(event) => {
-            setProjectInput({
-              ...projectInput,
+            setProjectInput((prevProjectInput) => ({
+              ...prevProjectInput,
               description: event.target.value,
-            });
+            }));
           }}
         />
         <Form.Control.Feedback type="invalid">
@@ -69,10 +69,10 @@ const ProjectForm = ({
           type="switch"
           checked={projectInput.private}
           onChange={(event) => {
-            setProjectInput({
-              ...projectInput,
+            setProjectInput((prevProjectInput) => ({
+              ...prevProjectInput,
               private: event.target.checked,
-            });
+            }));
           }}
           label="Private"
         />

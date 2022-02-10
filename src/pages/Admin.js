@@ -75,7 +75,7 @@ const Admin = () => {
             <Card.Body>
               <UserForm
                 onCreate={() => {
-                  setRefreshing(!refreshing);
+                  setRefreshing((prevRefreshing) => !prevRefreshing);
                 }}
               />
             </Card.Body>
