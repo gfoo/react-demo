@@ -4,6 +4,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import useHttp, { HTTP_STATUS_COMPLETE } from "../../hooks/use-http";
 import { deleteProject } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
+import MessageContext from "../../store/message-context";
 import ConfirmModal from "../Layout/ConfirmModal";
 import LimitedParagraph from "../Layout/LimitedParagraph";
 import ProjectMiniView from "./ProjectMiniView";
@@ -18,8 +19,9 @@ const ProjectView = ({
   descLimitSize = null,
   onDelete = () => {},
 }) => {
+  const { showMessageRef } = useContext(MessageContext);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const { token, showMessageRef } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   const {
     sendRequest: deleteProjectRequest,

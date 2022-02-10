@@ -1,9 +1,18 @@
 import { render, screen } from "@testing-library/react";
+import ReactDom from "react-dom";
 import { MemoryRouter } from "react-router-dom";
 import App from "./App";
 
+beforeAll(() => {
+  ReactDom.createPortal = jest.fn((element, node) => {
+    return element;
+  });
+});
+
 const checkDefaultLoginPage = () => {
-  expect(screen.getByText("React-Demo")).toBeInTheDocument();
+  const logo = screen.getByRole("img");
+  expect(logo).toHaveAttribute("src", "/Brand.png");
+  expect(logo).toHaveAttribute("alt", "React-Demo");
   expect(screen.queryByText(/logout/i)).not.toBeInTheDocument();
   expect(screen.queryByText(/profile/i)).not.toBeInTheDocument();
   expect(screen.getByText("Email address")).toBeInTheDocument();

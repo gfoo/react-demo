@@ -8,9 +8,11 @@ import Profile from "./pages/Profile";
 import Project from "./pages/Project";
 import Projects from "./pages/Projects";
 import AuthContext from "./store/auth-context";
+import MessageContext from "./store/message-context";
 
 function App() {
-  const { isLoggedIn, setShowMessageRef } = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
+  const { setShowMessageRef } = useContext(MessageContext);
   const showMessageRef = useRef();
   useEffect(() => {
     setShowMessageRef(showMessageRef);

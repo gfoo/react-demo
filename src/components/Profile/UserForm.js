@@ -6,10 +6,12 @@ import useHttp, {
 } from "../../hooks/use-http";
 import { createUser } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
+import MessageContext from "../../store/message-context";
 import SmallSpinner from "../Layout/SmallSpinner";
 
 const UserForm = ({ onCreate = () => {} }) => {
-  const { token, showMessageRef } = useContext(AuthContext);
+  const { showMessageRef } = useContext(MessageContext);
+  const { token } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
   const emailInputRef = useRef();
   const fullnameInputRef = useRef();

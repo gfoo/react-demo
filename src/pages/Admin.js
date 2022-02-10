@@ -9,9 +9,11 @@ import useHttp, {
 } from "../hooks/use-http";
 import { getAllUsers } from "../lib/api";
 import AuthContext from "../store/auth-context";
+import MessageContext from "../store/message-context";
 
 const Admin = () => {
-  const { token, showMessageRef } = useContext(AuthContext);
+  const { showMessageRef } = useContext(MessageContext);
+  const { token } = useContext(AuthContext);
 
   const [refreshing, setRefreshing] = useState(false);
   const [users, setUsers] = useState([]);

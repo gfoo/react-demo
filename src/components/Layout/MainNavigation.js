@@ -26,7 +26,7 @@ const MainNavigation = () => {
                 src="/Brand.png"
                 height="30"
                 className="d-inline-block align-top"
-                alt="TrendyWords"
+                alt="React-Demo"
               />
             </Navbar.Brand>
           </LinkContainer>

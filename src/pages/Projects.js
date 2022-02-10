@@ -9,6 +9,7 @@ import useHttp, {
 } from "../hooks/use-http";
 import { createProject, getProjects } from "../lib/api";
 import AuthContext from "../store/auth-context";
+import MessageContext from "../store/message-context";
 
 const emptyProject = {
   name: "",
@@ -17,7 +18,8 @@ const emptyProject = {
 };
 
 const Projects = () => {
-  const { token, showMessageRef } = useContext(AuthContext);
+  const { showMessageRef } = useContext(MessageContext);
+  const { token } = useContext(AuthContext);
   const [projects, setProjects] = useState([]);
   const [createProjectInput, setCreateProjectInput] = useState(emptyProject);
   const [validateCreateInput, setValidateCreateInput] = useState(false);

@@ -10,9 +10,11 @@ import useHttp, {
 } from "../hooks/use-http";
 import { getProject, updateProject } from "../lib/api";
 import AuthContext from "../store/auth-context";
+import MessageContext from "../store/message-context";
 
 const Project = () => {
-  const { token, userProfile, showMessageRef } = useContext(AuthContext);
+  const { showMessageRef } = useContext(MessageContext);
+  const { token, userProfile } = useContext(AuthContext);
   const [validateUpdateInput, setValidateUpdateInput] = useState(false);
   let params = useParams();
   const [project, setProject] = useState(null);

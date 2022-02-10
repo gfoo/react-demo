@@ -6,6 +6,7 @@ import useHttp, {
 } from "../../hooks/use-http";
 import { deleteUser, updateActivate, updateSuperuser } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
+import MessageContext from "../../store/message-context";
 import ConfirmModal from "../Layout/ConfirmModal";
 import SmallSpinner from "../Layout/SmallSpinner";
 import PasswordForm from "./PasswordForm";
@@ -24,7 +25,8 @@ const UserProfile = ({
   onUpdate,
   onDelete,
 }) => {
-  const { token, showMessageRef } = useContext(AuthContext);
+  const { showMessageRef } = useContext(MessageContext);
+  const { token } = useContext(AuthContext);
   const [isActiveState, setIsActiveState] = useState(isActive);
   const [isSuperuserState, setIsSuperuserState] = useState(isSuperuser);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);

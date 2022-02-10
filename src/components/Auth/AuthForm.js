@@ -6,11 +6,13 @@ import useHttp, {
 } from "../../hooks/use-http";
 import { login } from "../../lib/api";
 import AuthContext from "../../store/auth-context";
+import MessageContext from "../../store/message-context";
 import SmallSpinner from "../Layout/SmallSpinner";
 import classes from "./AuthForm.module.css";
 
 const AuthForm = ({ onLogged }) => {
-  const { login: loginCtx, showMessageRef } = useContext(AuthContext);
+  const { showMessageRef } = useContext(MessageContext);
+  const { login: loginCtx } = useContext(AuthContext);
   const [validated, setValidated] = useState(false);
 
   const {
