@@ -3,6 +3,7 @@ import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
+
 const MainNavigation = () => {
   const {
     isLoggedIn,
@@ -30,6 +31,25 @@ const MainNavigation = () => {
               />
             </Navbar.Brand>
           </LinkContainer>
+          <Navbar.Text>
+            <p>
+              [ more details on{" "}
+              <a
+                href="https://github.com/gfoo/react-demo"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  src="/github.png"
+                  height="20"
+                  className="d-inline-block align-center"
+                  alt="Github project"
+                />
+              </a>{" "}
+              ]
+            </p>
+          </Navbar.Text>
+
           {isLoggedIn && (
             <Navbar.Collapse className="justify-content-end">
               <LinkContainer to="/projects">
